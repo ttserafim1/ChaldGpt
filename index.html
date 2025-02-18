@@ -1,4 +1,4 @@
-<!-- Полный сайт ChaldGpt в стиле интерфейса ChatGPT -->
+<!-- Полный сайт ChaldGpt с рабочей интеграцией Deepseek API через OpenRouter -->
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -25,8 +25,6 @@
         </div>
     </div>
 
-    <script src="/static/scripts.js"></script>
-
     <style>
         body { background-color: #121212; color: #fff; display: flex; height: 100vh; margin: 0; }
         .sidebar { width: 250px; background: #1e1e1e; padding: 20px; }
@@ -41,9 +39,21 @@
     <script>
         async function sendMessage() {
             const message = document.getElementById('message').value;
-            const response = await fetch('/send', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({message})});
+            const chatBox = document.getElementById('chat-messages');
+            chatBox.innerHTML += `<div>Вы: ${message}</div>`;
+            const response = await fetch('https://openrouter.ai/api/v1/deepseek/v3/chat', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer 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',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    messages: [{role: 'user', content: message}]
+                })
+            });
             const data = await response.json();
-            document.getElementById('chat-messages').innerHTML += `<div>Вы: ${message}</div><div>ChaldGpt: ${data.reply}</div>`;
+            const reply = data.choices[0].message.content;
+            chatBox.innerHTML += `<div>ChaldGpt: ${reply}</div>`;
             document.getElementById('message').value = '';
         }
     </script>
