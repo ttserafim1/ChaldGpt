@@ -1,0 +1,29 @@
+<!-- HTML-шаблон интерфейса ChaldGpt -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChaldGpt</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div class="sidebar">
+        <h2>ChaldGpt</h2>
+        <ul>
+            <li>Сегодня</li>
+            <li>Предыдущие 7 дней</li>
+            <li>Обновить план</li>
+        </ul>
+    </div>
+    <div class="chat-container">
+        <div class="chat-messages" id="chat-messages"></div>
+        <div class="chat-input">
+            <input type="text" id="message" placeholder="Сообщить ChaldGpt"/>
+            <button onclick="sendMessage()">Отправить</button>
+        </div>
+    </div>
+
+    <script src="/static/scripts.js"></script>
+</body>
+</html>
