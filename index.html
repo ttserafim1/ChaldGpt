@@ -131,9 +131,9 @@
             background-color: #1a1a1a;
             z-index: 50;
             position: absolute;
-            top: 110px; /* Положение под приветствием (70px + 20px отступ + немного запаса) */
+            top: 110px;
             left: 0;
-            transition: top 0.5s ease-in-out; /* Анимация для перемещения */
+            transition: top 0.5s ease-in-out;
             box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
         }
         .input-container.fixed {
@@ -209,7 +209,8 @@
         const notification = document.getElementById('notification');
         const inputContainer = document.getElementById('inputContainer');
 
-        const API_KEY = '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';
+        // Используем предоставленный ключ (замените на действующий, если этот не работает)
+        const API_KEY = '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';
         const API_URL = 'https://openrouter.ai/api/v1/chat/completions';
 
         function setGreeting() {
@@ -234,15 +235,12 @@
         function showChat() {
             chatContainer.style.display = 'block';
             greetingText.style.display = 'none';
-            // Анимация "телепортации" вниз
             const viewportHeight = window.innerHeight;
             const inputHeight = inputContainer.offsetHeight;
             inputContainer.style.top = `${viewportHeight - inputHeight}px`;
-            // После завершения анимации фиксируем поле ввода
             setTimeout(() => {
                 inputContainer.classList.add('fixed');
-            }, 500); // Время анимации (0.5s)
-            // Увеличиваем отступ чата
+            }, 500);
             chatContainer.classList.add('fixed-input');
         }
 
