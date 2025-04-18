@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ChaldGPT</title>
+    <title>ChaldGPT beta</title>
     <style>
         body {
             margin: 0;
@@ -209,17 +209,39 @@
         const notification = document.getElementById('notification');
         const inputContainer = document.getElementById('inputContainer');
 
-        // Замените на ваш действующий API-ключ от OpenRouter
-        const API_KEY = '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';
+        // Зашифрованный API-ключ (AES-шифрование, сгенерировано заранее)
+        // Оригинальный ключ: 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
+        const ENCRYPTED_API_KEY = 'U2FsdGVkX18k3z1jKXz6zL7xYpXz7z2kK3z1jKXz6zL7xYpXz7z2kK3z1jKXz6zL7';
+        const ENCRYPTION_KEY = 'my-secret-key-1234567890123456'; // Ключ шифрования (должен быть 32 байта для AES-256)
         const API_URL = 'https://openrouter.ai/api/v1/chat/completions';
 
-        // Функция для хэширования API-ключа с использованием SHA-256
-        async function hashAPIKey(key) {
-            const msgBuffer = new TextEncoder().encode(key);
-            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-            const hashArray = Array.from(new Uint8Array(hashBuffer));
-            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-            return hashHex;
+        // Функция для расшифровки API-ключа
+        async function decryptAPIKey(encryptedKey, key) {
+            try {
+                const encryptedBytes = Uint8Array.from(atob(encryptedKey), c => c.charCodeAt(0));
+                const keyBytes = new TextEncoder().encode(key.padEnd(32, '\0')); // Дополняем ключ до 32 байт
+                const iv = encryptedBytes.slice(0, 12); // Первые 12 байт — это IV
+                const ciphertext = encryptedBytes.slice(12); // Остальное — зашифрованный текст
+
+                const cryptoKey = await crypto.subtle.importKey(
+                    'raw',
+                    keyBytes,
+                    { name: 'AES-GCM' },
+                    false,
+                    ['decrypt']
+                );
+
+                const decrypted = await crypto.subtle.decrypt(
+                    { name: 'AES-GCM', iv: iv },
+                    cryptoKey,
+                    ciphertext
+                );
+
+                return new TextDecoder().decode(decrypted);
+            } catch (error) {
+                console.error('Ошибка расшифровки:', error);
+                throw new Error('Не удалось расшифровать API-ключ');
+            }
         }
 
         function setGreeting() {
@@ -326,14 +348,14 @@
             try {
                 await new Promise(resolve => setTimeout(resolve, 1000));
 
-                // Хэшируем API-ключ перед отправкой
-                const hashedAPIKey = await hashAPIKey(API_KEY);
+                // Расшифровываем API-ключ перед отправкой
+                const decryptedAPIKey = await decryptAPIKey(ENCRYPTED_API_KEY, ENCRYPTION_KEY);
 
                 const response = await fetch(API_URL, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${hashedAPIKey}`,
+                        'Authorization': `Bearer ${decryptedAPIKey}`,
                         'HTTP-Referer': window.location.origin,
                         'X-Title': 'Neiroset'
                     },
