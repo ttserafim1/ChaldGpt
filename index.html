@@ -210,8 +210,17 @@
         const inputContainer = document.getElementById('inputContainer');
 
         // Замените на ваш действующий API-ключ от OpenRouter
-        const API_KEY = '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';
+        const API_KEY = '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';
         const API_URL = 'https://openrouter.ai/api/v1/chat/completions';
+
+        // Функция для хэширования API-ключа с использованием SHA-256
+        async function hashAPIKey(key) {
+            const msgBuffer = new TextEncoder().encode(key);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            return hashHex;
+        }
 
         function setGreeting() {
             const hour = new Date().getHours();
@@ -317,11 +326,14 @@
             try {
                 await new Promise(resolve => setTimeout(resolve, 1000));
 
+                // Хэшируем API-ключ перед отправкой
+                const hashedAPIKey = await hashAPIKey(API_KEY);
+
                 const response = await fetch(API_URL, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${API_KEY}`,
+                        'Authorization': `Bearer ${hashedAPIKey}`,
                         'HTTP-Referer': window.location.origin,
                         'X-Title': 'Neiroset'
                     },
